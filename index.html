@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+  </head>
+  <body>
+
+        <div id="app">
+
+            <div v-if="(userAuth == '' || userAuth == null)" >
+                <br>
+                <br>
+                <br>
+                <br>
+                <h4 class="text-center">Ingresar</h4>
+                <br>
+                <br>
+                <br>
+                <div class="row align-middle mx-auto d-flex h-100 align-self-center w-100">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                          <label for="emailUser">Correo</label>
+                          <input type="email" name="emailUser" id="emailUser" v-model="emailUser" class="form-control" placeholder="">
+                        </div>
+                        <div class="form-group">
+                          <label for="passwordUser">Contraseña</label>
+                          <input type="password" name="passwordUser" id="passwordUser" v-model="passwordUser" class="form-control" placeholder="">
+                        </div>
+
+                        <!-- <input type="text" v-model="userEmail" class="form-control" placeholder="Correo"> -->
+                    </div>
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6 text-center">
+                        <button id="idButton" @click="loginUser" class="btn btn-primary mt-3">Ingresar</button>
+                        <!-- <button id="idButton" class="btn btn-primary mt-3">Ingresar</button> -->
+                    </div>
+                </div>
+                <!-- <div class="row align-middle mx-auto d-flex h-100 align-self-center w-100">
+                    <div class="col-sm-12">
+                        <input type="text" v-model="userAuth1" class="form-control" placeholder="Usuario">
+                    </div>
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6 text-center">
+                        <button @click="registrarUsuario" class="btn btn-primary mt-3">Ingresar</button>
+                    </div>
+                </div> -->
+
+                <br>
+                <br>
+                <br>
+                 <div class="row mx-auto">
+                    <div class="col-sm-12 ">
+                        <div class="alert alert-info text-sm-left" role="alert">
+                            <small>
+                                Solicite un usuario al administrador para ingresar.
+                                <br>
+                                El usuario es una cadena de texto del tipo: <b>vFHWMJKnRc9DIb6</b>
+                            </small>
+                         </div>
+                    </div>
+                 </div>
+
+            </div>
+
+            <div v-if="(userAuth != '' && userAuth != null)">
+                <div class=" p-2 bg-primary text-light">
+                    <div class="row">
+                        <div class="col-8">
+                            <h4>Clientes</h4>
+                        </div>
+                        <div class="col-4 text-right">
+                            <div v-if="(vista == 'registro')">
+                                <button class="btn btn-primary btn-rounded" @click="showLista"><i class="fa fa-arrow-left"></i></button>
+                            </div>
+                            <div v-if="(vista == 'lista')">
+                                <button class="btn btn-primary btn-rounded" @click="showRegistro"><i class="fa fa-plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- mobile list of clients  -->
+                <div v-if="(vista == 'registro')">
+                    <div class="m-2">
+                        <div v-if="errorStr">
+                            Sorry, but the following error
+                            occurred: {{errorStr}}
+                        </div>
+                        
+                        <div v-if="gettingLocation">
+                            <i>Getting your location...</i>
+                        </div>
+                        
+                        <div v-if="location">
+                            Tu ubicacion es: {{ location.coords.latitude }}, {{ location.coords.longitude}}
+                        </div>
+            
+                        <form @submit.prevent="createCliente()" enctype="multipart/form-data">
+
+                            <!-- foto, nombres, empresa, telefono, direccion, latitud, longitud, hora, usuario, interes,, interes_otro, precio, precio_otro, motivo, tiene_sistema, descripcion -->
+                            <!-- ver imagen  -->
+                            <div class="form-group text-center">
+                                <img :src="foto" width="100px" height="100px">
+                            </div>
+                            <!-- foto  -->
+                            <div class="form-group">
+                                <label for="foto">Foto <span class="text-danger">*</span> </label>
+                                <input type="file" accept="image/*" capture="camera" @change="uploadImage($event)" id="file-input">
+                            </div>  
+                            
+                            <div class="form-group">
+                            <label for="nombres">Nombre completo <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="nombres" v-model="nombres">
+                            </div>
+                            <div class="form-group">
+                            <label for="empresa">Empresa <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="empresa" v-model="empresa">
+                            </div>
+                            <div class="form-group">
+                            <label for="telefono">Telefono <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="telefono" v-model="telefono">
+                            </div>
+                            <div class="form-group">
+                            <label for="direccion">Direccion <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="direccion" v-model="direccion">
+                            </div>
+                            <div class="form-group d-none">
+                            <label for="latitud">Latitud</label>
+                            <input type="text" class="form-control form-control-sm" id="latitud" v-model="latitud">
+                            </div>
+                            <div class="form-group d-none">
+                            <label for="longitud">Longitud</label>
+                            <input type="text" class="form-control form-control-sm" id="longitud" v-model="longitud">
+                            </div>
+                            <div class="form-group d-none">
+                            <label for="hora">Hora</label>
+                            <input type="text" class="form-control form-control-sm" id="hora" v-model="hora">
+                            </div>
+                            <div class="form-group d-none">
+                            <label for="usuario">Usuario</label>
+                            <input type="text" class="form-control form-control-sm" id="usuario" v-model="usuario">
+                            </div>
+                            <div class="form-group">
+                            <label for="interes">Interes <span class="text-danger">*</span> </label>
+                                <select class="form-control form-control-sm" id="interes" v-model="interes">
+                                    <!-- inventario, distribucion, foodapp, otro  -->
+                                    <option value="Inventario">Inventario</option>
+                                    <option value="Distribucion">Distribucion</option>
+                                    <option value="Foodapp">Foodapp</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                            <label for="interes_otro">Interes otro</label>
+                            <input type="text" class="form-control form-control-sm" id="interes_otro" v-model="interes_otro" :disabled="interes=='Otro' ? false : true" >
+                            </div>
+                            <div class="form-group">
+                            <label for="precio">Precio <span class="text-danger">*</span></label>
+                            <select class="form-control form-control-sm" id="precio" v-model="precio">
+                                <option value="Mensual">Mensual</option>
+                                <option value="Anual">Anual</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            </div>
+                            <div class="form-group">
+                            <label for="precio_otro">Precio otro</label>
+                            <input type="text" class="form-control form-control-sm" id="precio_otro" v-model="precio_otro" :disabled="precio=='Otro' ? false : true">
+                            </div>
+                            <div class="form-group">
+                            <label for="motivo">Motivo</label>
+                            <input type="text" class="form-control form-control-sm" id="motivo" v-model="motivo">
+                            </div>
+                            <div class="form-group">
+                            <label for="tiene_sistema">Tiene sistema <span class="text-danger">*</span></label>
+                            <select class="form-control form-control-sm" id="tiene_sistema" v-model="tiene_sistema">
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
+                            </select>
+                            </div>
+                            <div class="form-group">
+                            <label for="descripcion">Descripcion</label>
+                            <textarea type="text" class="form-control form-control-sm" id="descripcion" v-model="descripcion"></textarea>
+                            </div>
+
+            
+                            <button type="submit" class="btn btn-success btn-sm btn-block">Crear</button>
+                        </form>
+                    </div>
+                </div>
+                <div v-if="(vista == 'lista')">
+                    <div v-show="elementVisible" class="alert alert-success" role="alert" id="alerta">
+                        Creado o actualizado correctamente.
+                    </div>
+
+                    <ul class="list-group" v-for="cliente in clientes">
+                        <li class="list-group-item">
+                            <!-- mostrar datos del cliente  -->
+                            <small>
+                                <b>Cliente:</b> {{ cliente.nombres }} (Empresa: {{ cliente.empresa }}) <br>
+                                <b>Tel.:</b> {{ cliente.telefono }} <br>
+                                <b>Direccion:</b> {{ cliente.direccion }} <br>
+                                <b>Interes:</b> {{ cliente.interes }} &nbsp; &nbsp; <b>Precio:</b> {{ cliente.precio }} <br>                            
+                                <!-- <b>Motivo:</b> {{ cliente.motivo }} <br> -->
+                                <!-- <b>Tiene sistema:</b> {{ cliente.tiene_sistema }} <br> -->
+                                <b>Descripcion:</b> {{ cliente.descripcion }} <br>
+                            </small>
+                            <div class="btn-group btn-block">
+                                <button class="btn btn-sm btn-outline-primary" @click="editCliente(cliente.id)">Editar</button>
+                                <button class="btn btn-sm btn-outline-danger" @click="deleteCliente(cliente.id)">Eliminar</button>
+                            </div>
+
+                        </li>
+                    </ul>
+                </div>
+            </div>
+          
+          
+
+        </div>
+      
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="js-sdk-master/dist/pocketbase.umd.js" ></script>
+
+    <script>
+        // const client = new PocketBase("http://localhost:8090/");
+        const client = new PocketBase("https://pocketbase.josema.pro/");
+
+        const userAuthData1 = '';
+        
+        vue = new Vue({
+          
+            el: '#app',
+            data: {
+
+                userAuth: '',
+                userAuth1: '',
+                profileId: '',
+
+                emailUser : '', // vendedor@mail.com
+                passwordUser : '', // vendedor1
+
+                link : "https://pocketbase.josema.pro/",
+                message: 'Hello Vue!',
+                clientes: [],
+                clientesIdc: '',
+
+                clienteId: '',
+                nombres : '',
+                empresa  : '',
+                telefono : '',
+                direccion : '',
+                latitud : '',
+                longitud : '',
+                hora : '',
+                usuario : '',
+                interes : '',
+                interes_otro : '',
+                precio : '',
+                precio_otro : '',
+                motivo : '',
+                tiene_sistema  : '',
+                descripcion : '',
+
+                file: '',
+                foto: '',
+
+                // para coordenadas
+                errorStr : '',
+                gettingLocation : false,
+                location : null,
+
+                // para vista formulario
+                vista : 'lista',
+
+                // para alerta
+                elementVisible : false,
+            },
+            created() {
+              //do we support geolocation
+              if(!("geolocation" in navigator)) {
+                this.errorStr = 'Geolocation is not available.';
+                return;
+              }
+
+              this.gettingLocation = true;
+              // get position
+              navigator.geolocation.getCurrentPosition(pos => {
+                this.gettingLocation = false;
+                this.location = pos;
+              }, err => {
+                this.gettingLocation = false;
+                this.errorStr = err.message;
+              })
+
+              // verificar si userAuthData1 
+
+
+            },
+            methods: {
+                
+                async loginUser() {
+                    this.userAuthData1 = await client.Users.authViaEmail(vue.emailUser, vue.passwordUser);
+                    console.log(this.userAuthData1);
+                    // vue.userAuth = userAuth1.users.id; 
+                    // console.log(vue.userAuth);
+                    this.userAuth = this.userAuthData1.user.id;
+                    this.profileId = this.userAuthData1.user.profile.id; 
+                    this.getClientes();              
+                },
+
+                showLista: function(){
+                    this.vista = 'lista';
+                    // vue.elementVisible = true;
+                    // setTimeout(() => vue.elementVisible = false, 3000)
+                    // console.log(this.userAuth);
+                },
+                showRegistro: function(){
+                    this.vista = 'registro';
+                },
+                getClientes: function() {
+                    // client.Authorization = this.userAuthData1.token;
+                    client.Records.getFullList("clientes", 200)
+                    .then(function (records) {
+                        // console.log(records);
+                        vue.clientes = records; 
+                        // console.log(records[0]["@collectionId"]) ;
+                        vue.clientesIdc = records[0]["@collectionId"];                      
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+                },
+                uploadImage(event) {
+                    this.file = event.target.files[0];
+                    this.foto = URL.createObjectURL(this.file);
+                },
+                createCliente: function() {
+                  if (this.clienteId != '') {
+                    this.updateCliente();
+                  } else {
+                    // set form data
+                    var formData = new FormData();
+                    let hora = new Date();
+                    let hora_str = hora.getHours() + ":" + hora.getMinutes() + ":" + hora.getSeconds();
+
+                    formData.append('foto', this.file);
+                    formData.append('nombres', this.nombres);
+                    formData.append('empresa', this.empresa);
+                    formData.append('telefono', this.telefono);
+                    formData.append('direccion', this.direccion);
+                    formData.append('latitud', this.location.coords.latitude);
+                    formData.append('longitud', this.location.coords.longitude);
+                    formData.append('hora', hora_str);
+                    formData.append('usuario', this.userAuth);
+                    formData.append('interes', this.interes);
+                    formData.append('interes_otro', this.interes_otro);
+                    formData.append('precio', this.precio);
+                    formData.append('precio_otro', this.precio_otro);
+                    formData.append('motivo', this.motivo);
+                    formData.append('tiene_sistema', this.tiene_sistema);
+                    formData.append('descripcion', this.descripcion);
+                    formData.append('usuario_id', this.profileId);
+                    // create record
+                    client.Records.create("clientes", formData, {
+                      headers: {
+                        "Content-Type": "multipart/form-data"
+                      },
+                    })
+                    .then(function (record) {
+                        // console.log(record);
+                        vue.vista = 'lista';
+                        vue.getClientes();
+                        vue.elementVisible = true;
+                        setTimeout(() => vue.elementVisible = false, 3000)
+                        vue.resetearCampos();                        
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+                  }
+                },
+                deleteCliente: function(id) {
+                    client.Records.delete("clientes", id)
+                    .then(function (record) {
+                        // console.log(record);
+                        vue.getClientes();
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+                },
+                editCliente: function(id) {
+                    this.clienteId = id;
+                    client.Records.getOne("clientes", id)
+                    .then(function (record) {
+                        // console.log(record);
+                        vue.nombres = record.nombres;
+                        vue.empresa = record.empresa;
+                        vue.telefono = record.telefono;
+                        vue.direccion = record.direccion;
+                        vue.latitud = record.latitud;
+                        vue.longitud = record.longitud;
+                        vue.hora = record.hora;
+                        vue.usuario = record.usuario;
+                        vue.interes = record.interes;
+                        vue.interes_otro = record.interes_otro;
+                        vue.precio = record.precio;
+                        vue.precio_otro = record.precio_otro;
+                        vue.motivo = record.motivo;
+                        vue.tiene_sistema = record.tiene_sistema;
+                        vue.descripcion = record.descripcion;
+                        // vue.foto = record.foto;
+                        vue.foto = (record.foto != null)?  vue.link + 'api/files/' + vue.clientesIdc + '/' + record.id + '/' + record.foto + '?thumb=100x100' : ''
+                        vue.vista = 'registro';
+                    }).catch(function (error) {
+                        // error...
+                        alert(error);
+                    });
+                },
+
+                updateCliente: function() {
+                    // set form data
+                    var formData = new FormData();
+                    formData.append('foto', this.file);
+                    formData.append('nombres', this.nombres);
+                    formData.append('empresa', this.empresa);
+                    formData.append('telefono', this.telefono);
+                    formData.append('direccion', this.direccion);
+                    formData.append('latitud', this.location.coords.latitude);
+                    formData.append('longitud', this.location.coords.longitude);
+                    formData.append('hora', this.hora);
+                    formData.append('usuario', this.userAuth);
+                    formData.append('interes', this.interes);
+                    formData.append('interes_otro', this.interes_otro);
+                    formData.append('precio', this.precio);
+                    formData.append('precio_otro', this.precio_otro);
+                    formData.append('motivo', this.motivo);
+                    formData.append('tiene_sistema', this.tiene_sistema);
+                    formData.append('descripcion', this.descripcion);
+
+                    client.Records.update("clientes", this.clienteId, formData, {
+                      headers: {
+                        "Content-Type": "multipart/form-data"
+                      },
+                    })
+                    .then(function (record) {
+                        // console.log(record);
+                        vue.resetearCampos();
+                        vue.getClientes();
+                        vue.elementVisible = true;
+                        setTimeout(() => vue.elementVisible = false, 3000)
+                        vue.vista = 'lista';
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+                },
+                resetearCampos: function() {
+                    this.clienteId = '';
+                    this.nombres = '';
+                    this.empresa  = '';
+                    this.telefono = '';
+                    this.direccion = '';
+                    this.latitud = '';
+                    this.longitud = '';
+                    this.hora = '';
+                    this.usuario = '';
+                    this.interes = '';
+                    this.interes_otro = '';
+                    this.precio = '';
+                    this.precio_otro = '';
+                    this.motivo = '';
+                    this.tiene_sistema  = '';
+                    this.descripcion = '';
+                    this.file= '';
+                    this.foto = '';
+                },
+            },
+            mounted: function() {
+                // this.getClientes();
+                // Subscribe to changes in any record from the collection
+                // client.Realtime.subscribe("clientes", function (e) {
+                //     console.log(e.record);
+                //     alert("Nuevo cliente agregado");
+                // });
+
+            }
+        });
+    </script>
+
+  </body>
+</html>
